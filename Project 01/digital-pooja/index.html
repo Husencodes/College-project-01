@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Ganesh 3D - Digital Pooja Experience</title>
+   <link rel="stylesheet" href="style.css">
+        
+</head>
+<body>
+
+    <!-- ================= LANDING PAGE VIEW ================= -->
+    <div id="landing-view">
+        <header class="navbar">
+            <div class="logo">🕉️ Ganesh 3D</div>
+            <nav>
+                <a class="active" onclick="switchView('landing')">Home</a>
+                <a onclick="switchView('pooja')">Digital Pooja</a>
+            </nav>
+        </header>
+
+        <main class="hero">
+            <div class="particles" id="particles"></div>
+            <div class="hero-content">
+                <h1 class="glow-text">🕉️ GANESH 3D</h1>
+                <p class="tagline">Experience Devotion. Celebrate Tradition. Connect Digitally.</p>
+                <div class="hero-cta">
+                    <button class="btn btn-primary" onclick="switchView('pooja')">Begin Pooja</button>
+                </div>
+            </div>
+            <div class="ganesha-hero-visual">
+                <div class="halo"></div>
+                <img src="idol" alt="" style="width: 300px; height: 300px;">
+            </div>
+        </main>
+    </div>
+
+    <!-- ================= POOJA ROOM VIEW ================= -->
+    <div id="pooja-view" class="hidden">
+        <!-- Welcome Modal -->
+        <div id="welcome-modal" class="modal-overlay">
+            <div class="modal-card">
+                <h2>Welcome to Ganesh Pooja</h2>
+                <p>Take a moment to prepare yourself for a serene interactive devotion.</p>
+                <button id="btn-start-pooja" class="btn btn-primary">Start Ritual</button>
+            </div>
+        </div>
+
+        <!-- UI Overlay Controls -->
+        <header class="pooja-header">
+            <div class="header-title">🕉️ Digital Pooja Room</div>
+            <div class="stats-badge" id="pooja-stats">Completed: 0</div>
+            <div class="ui-controls">
+                <button id="btn-toggle-audio" class="icon-btn" title="Toggle Sound">🔊</button>
+                <button id="btn-home" class="icon-btn" title="Back to Home" onclick="switchView('landing')">🏠</button>
+                <button id="btn-restart" class="icon-btn" title="Restart Ritual">↻</button>
+            </div>
+        </header>
+
+        <!-- Progress Tracker -->
+        <div class="progress-bar-container">
+            <div class="progress-info">
+                <span id="step-indicator">Step 1 / 8</span>
+                <span id="step-name">Diya Lighting</span>
+            </div>
+            <div class="progress-track">
+                <div id="progress-fill" class="progress-fill"></div>
+            </div>
+        </div>
+
+        <!-- Toast Instructions -->
+        <div id="toast-instruction" class="toast-instruction">
+            Pick up the matchstick and drag it to the Diya wick to light it.
+        </div>
+
+        <!-- Main Pooja Room Environment -->
+        <main class="pooja-environment" id="pooja-environment">
+            <!-- Background Decor -->
+            <div class="temple-pillar pillar-left"></div>
+            <div class="temple-pillar pillar-right"></div>
+            <div class="rangoli-floor"></div>
+
+            <!-- Hanging Bell -->
+            <div class="bell-container" id="hanging-bell">
+                <div class="bell-chain"></div>
+                <div class="bell-body">🔔</div>
+            </div>
+
+            <!-- Center Stage: Ganesha -->
+            <div id="ganesha-container" class="ganesha-container">
+                <div class="divine-halo" id="divine-halo"></div>
+                <img src="idol" alt="" style="width: 500px; height: 500px;">
+                <!-- Offering Drop Zone -->
+                <div id="drop-zone-ganesha" class="drop-zone"></div>
+                <!-- Layer for offered items -->
+                <div id="offered-items-layer" class="offered-items-layer"></div>
+            </div>
+
+            <!-- Left Items Tray -->
+            <div class="tray tray-left">
+                <div class="tray-section">
+                    <span class="label">Pushpa</span>
+                    <div class="item-grid">
+                        <div class="draggable-item flower-item" id="flower-1" data-type="flower">🌺</div>
+                        <div class="draggable-item flower-item" id="flower-2" data-type="flower">🌼</div>
+                        <div class="draggable-item flower-item" id="flower-3" data-type="flower">🌸</div>
+                    </div>
+                </div>
+                <div class="tray-section">
+                    <span class="label">Durva</span>
+                    <div class="draggable-item durva-item" id="durva-item" data-type="durva">🌿</div>
+                </div>
+                <div class="tray-section">
+                    <span class="label">Modak</span>
+                    <div class="item-grid">
+                        <div class="draggable-item modak-item" id="modak-1" data-type="modak">🥟</div>
+                        <div class="draggable-item modak-item" id="modak-2" data-type="modak">🥟</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Items Tray -->
+            <div class="tray tray-right">
+                <div class="diya-section">
+                    <div class="diya" id="diya-target">
+                        <div class="wick" id="diya-wick"></div>
+                        <div class="flame hidden" id="diya-flame">
+                            <div class="flame-inner"></div>
+                        </div>
+                    </div>
+                    <div class="matchstick" id="matchstick">🪄</div>
+                </div>
+
+                <div class="incense-section">
+                    <div class="incense-holder" id="incense-holder">
+                        <div class="smoke-particles" id="smoke-container"></div>
+                    </div>
+                    <div class="draggable-item incense-stick" id="incense-stick" data-type="incense">🥢</div>
+                </div>
+
+                <div class="aarti-section">
+                    <div class="aarti-plate" id="aarti-plate">
+                        <div class="aarti-flame hidden" id="aarti-flame"></div>
+                        🪔
+                    </div>
+                </div>
+            </div>
+
+            <!-- Namaskar Hold Area -->
+            <div id="namaskar-zone" class="namaskar-zone hidden">
+                <button id="btn-namaskar" class="btn-namaskar">
+                    <span>🙏 Press & Hold to Pray</span>
+                    <svg class="progress-ring" width="120" height="120">
+                        <circle class="progress-ring__circle" stroke="gold" stroke-width="6" fill="transparent" r="52" cx="60" cy="60"/>
+                    </svg>
+                </button>
+            </div>
+        </main>
+
+        <!-- Completion Modal -->
+        ```html
+<div id="completion-modal" class="modal-overlay hidden">
+    <div class="modal-card">
+
+        <!-- Ganesh Idol -->
+        <img
+            src="idoll.png"
+            alt="Ganesh idol"
+            class="completion-idol"
+        >
+
+        <h2>Ganesh Pooja Completed 🙏</h2>
+
+        <p>
+            May Lord Ganesha bless you with wisdom,
+            happiness, and prosperity.
+        </p>
+
+        <p class="morya-text">
+            Ganpati Bappa Morya! 🙏
+        </p>
+
+        <div class="stats-summary" id="pooja-summary"></div>
+
+        <div class="modal-actions" style="margin-top: 15px;">
+            <button id="btn-restart-final" class="btn btn-primary">
+                Perform Again
+            </button>
+
+            <button
+                class="btn btn-secondary"
+                onclick="switchView('landing')">
+                Home Page
+            </button>
+        </div>
+
+    </div>
+</div>
+```
+
+        <!-- Accessibility Alternative Controls -->
+        <div class="a11y-controls" id="a11y-controls">
+            <button id="btn-a11y-action" class="btn btn-a11y">Alternative Action Step</button>
+        </div>
+    </div>
+
+    <!-- ================= APPLICATION JAVASCRIPT ================= -->
+    <script>
+        // --- VIEW SWITCHER ---
+        function switchView(viewName) {
+            const landingView = document.getElementById('landing-view');
+            const poojaView = document.getElementById('pooja-view');
+
+            if (viewName === 'pooja') {
+                landingView.classList.add('hidden');
+                poojaView.classList.remove('hidden');
+                document.getElementById('welcome-modal').classList.remove('hidden');
+            } else {
+                poojaView.classList.add('hidden');
+                landingView.classList.remove('hidden');
+            }
+        }
+
+        // --- LANDING PAGE BACKGROUND PARTICLES ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const particlesContainer = document.getElementById('particles');
+            if (particlesContainer) {
+                for (let i = 0; i < 25; i++) {
+                    const p = document.createElement('div');
+                    p.style.position = 'absolute';
+                    p.style.width = `${Math.random() * 6 + 2}px`;
+                    p.style.height = p.style.width;
+                    p.style.backgroundColor = '#FFD700';
+                    p.style.borderRadius = '50%';
+                    p.style.opacity = Math.random() * 0.6 + 0.2;
+                    p.style.left = `${Math.random() * 100}%`;
+                    p.style.top = `${Math.random() * 100}%`;
+                    p.style.boxShadow = '0 0 8px #FFD700';
+                    
+                    p.animate([
+                        { transform: 'translateY(0px)', opacity: p.style.opacity },
+                        { transform: `translateY(-${Math.random() * 100 + 50}px)`, opacity: 0 }
+                    ], {
+                        duration: Math.random() * 3000 + 3000,
+                        iterations: Infinity
+                    });
+
+                    particlesContainer.appendChild(p);
+                }
+            }
+        });
+
+        // --- SOUND SYNTHESIZER ---
+        class SoundManager {
+            constructor() {
+                this.ctx = null;
+                this.enabled = false;
+                this.volume = 0.3;
+            }
+
+            init() {
+                if (!this.ctx) {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    this.ctx = new AudioContext();
+                }
+                if (this.ctx.state === 'suspended') {
+                    this.ctx.resume();
+                }
+            }
+
+            toggleSound() {
+                this.enabled = !this.enabled;
+                if (this.enabled) this.init();
+                return this.enabled;
+            }
+
+            playBell() {
+                if (!this.enabled || !this.ctx) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(1200, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(400, this.ctx.currentTime + 1.2);
+
+                gain.gain.setValueAtTime(this.volume, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 1.2);
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+
+                osc.start();
+                osc.stop(this.ctx.currentTime + 1.2);
+            }
+
+            playOffering() {
+                if (!this.enabled || !this.ctx) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(523.25, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(659.25, this.ctx.currentTime + 0.3);
+
+                gain.gain.setValueAtTime(this.volume * 0.5, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.3);
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.3);
+            }
+
+            playDiya() {
+                if (!this.enabled || !this.ctx) return;
+                const bufferSize = this.ctx.sampleRate * 0.2;
+                const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    data[i] = Math.random() * 2 - 1;
+                }
+
+                const noise = this.ctx.createBufferSource();
+                noise.buffer = buffer;
+
+                const filter = this.ctx.createBiquadFilter();
+                filter.type = 'bandpass';
+                filter.frequency.value = 1000;
+
+                const gain = this.ctx.createGain();
+                gain.gain.setValueAtTime(this.volume * 0.4, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.2);
+
+                noise.connect(filter);
+                filter.connect(gain);
+                gain.connect(this.ctx.destination);
+
+                noise.start();
+            }
+        }
+
+        const audioMgr = new SoundManager();
+
+        // --- POOJA ROOM ENGINE ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const STEPS = {
+                0: { name: "Diya Lighting", hint: "Pick up the matchstick and drag it to the Diya wick." },
+                1: { name: "Pushpa Offering", hint: "Drag flowers to Ganesha (0/3 offered)." },
+                2: { name: "Durva Offering", hint: "Drag the Durva grass to Ganesha." },
+                3: { name: "Naivedya Offering", hint: "Drag Modaks to Ganesha's tray." },
+                4: { name: "Dhoop / Incense", hint: "Drag the incense stick to the holder." },
+                5: { name: "Temple Bell", hint: "Tap/Click the hanging bell to ring it." },
+                6: { name: "Aarti Ceremony", hint: "Hold the Aarti plate and rotate it around Ganesha in circles." },
+                7: { name: "Namaskar", hint: "Press and hold the Namaskar button to pray." },
+                8: { name: "Completed", hint: "Pooja Completed successfully!" }
+            };
+
+            const state = {
+                currentStep: 0,
+                flowersOffered: 0,
+                requiredFlowers: 3,
+                modaksOffered: 0,
+                requiredModaks: 2,
+                aartiAngleTotal: 0,
+                lastAartiAngle: null,
+                poojaCount: parseInt(localStorage.getItem('g3d_pooja_count') || '0')
+            };
+
+            const stepIndicator = document.getElementById('step-indicator');
+            const stepName = document.getElementById('step-name');
+            const progressFill = document.getElementById('progress-fill');
+            const toast = document.getElementById('toast-instruction');
+            const statsBadge = document.getElementById('pooja-stats');
+            const ganeshaContainer = document.getElementById('ganesha-container');
+            const dropZone = document.getElementById('drop-zone-ganesha');
+            const divineHalo = document.getElementById('divine-halo');
+            const offeredItemsLayer = document.getElementById('offered-items-layer');
+
+            function updateUI() {
+                stepIndicator.innerText = `Step ${state.currentStep + 1} / 8`;
+                stepName.innerText = STEPS[state.currentStep].name;
+                progressFill.style.width = `${((state.currentStep) / 8) * 100}%`;
+                toast.innerText = STEPS[state.currentStep].hint;
+                statsBadge.innerText = `Completed: ${state.poojaCount}`;
+
+                if (state.currentStep === 1) {
+                    toast.innerText = `Drag flowers to Ganesha (${state.flowersOffered}/${state.requiredFlowers} offered).`;
+                }
+                
+                document.getElementById('btn-a11y-action').innerText = `Skip/Perform: ${STEPS[state.currentStep].name}`;
+            }
+
+            function advanceStep() {
+                if (state.currentStep < 8) {
+                    state.currentStep++;
+                    updateUI();
+                    if (state.currentStep === 7) {
+                        document.getElementById('namaskar-zone').classList.remove('hidden');
+                    } else if (state.currentStep === 8) {
+                        completePooja();
+                    }
+                }
+            }
+
+            document.getElementById('btn-start-pooja').addEventListener('click', () => {
+                document.getElementById('welcome-modal').classList.add('hidden');
+                audioMgr.init();
+                audioMgr.enabled = true;
+                updateUI();
+            });
+
+            document.getElementById('btn-toggle-audio').addEventListener('click', (e) => {
+                const active = audioMgr.toggleSound();
+                e.target.innerText = active ? "🔊" : "🔇";
+            });
+
+            document.getElementById('btn-restart').addEventListener('click', () => {
+                resetPoojaState();
+            });
+
+            document.getElementById('btn-restart-final').addEventListener('click', () => {
+                document.getElementById('completion-modal').classList.add('hidden');
+                resetPoojaState();
+            });
+
+            function resetPoojaState() {
+                state.currentStep = 0;
+                state.flowersOffered = 0;
+                state.modaksOffered = 0;
+                state.aartiAngleTotal = 0;
+                state.lastAartiAngle = null;
+
+                offeredItemsLayer.innerHTML = '';
+                document.getElementById('diya-flame').classList.add('hidden');
+                divineHalo.classList.remove('illuminated');
+                document.getElementById('matchstick').classList.remove('disabled');
+                
+                document.querySelectorAll('.draggable-item').forEach(el => el.classList.remove('disabled'));
+                document.getElementById('namaskar-zone').classList.add('hidden');
+                
+                updateUI();
+            }
+
+            document.getElementById('btn-a11y-action').addEventListener('click', () => {
+                if (state.currentStep === 0) lightDiya();
+                else if (state.currentStep === 1) {
+                    state.flowersOffered = state.requiredFlowers;
+                    advanceStep();
+                } else if (state.currentStep === 2) advanceStep();
+                else if (state.currentStep === 3) advanceStep();
+                else if (state.currentStep === 4) lightIncense();
+                else if (state.currentStep === 5) ringBell();
+                else if (state.currentStep === 6) completeAarti();
+                else if (state.currentStep === 7) completeNamaskar();
+            });
+
+            function makeDraggable(element, onDropCheck) {
+                let startX = 0, startY = 0;
+
+                element.addEventListener('pointerdown', (e) => {
+                    e.preventDefault();
+                    element.setPointerCapture(e.pointerId);
+                    startX = e.clientX;
+                    startY = e.clientY;
+                    element.style.transition = 'none';
+                    element.style.zIndex = 1000;
+                });
+
+                element.addEventListener('pointermove', (e) => {
+                    if (!element.hasPointerCapture(e.pointerId)) return;
+                    const dx = e.clientX - startX;
+                    const dy = e.clientY - startY;
+                    element.style.transform = `translate(${dx}px, ${dy}px)`;
+                });
+
+                element.addEventListener('pointerup', (e) => {
+                    if (!element.hasPointerCapture(e.pointerId)) return;
+                    element.releasePointerCapture(e.pointerId);
+                    
+                    const dropSuccess = onDropCheck(e.clientX, e.clientY, element);
+
+                    if (!dropSuccess) {
+                        element.style.transition = 'transform 0.3s ease';
+                        element.style.transform = 'translate(0px, 0px)';
+                    }
+                });
+            }
+
+            // Step 1: Diya Lighting
+            const matchstick = document.getElementById('matchstick');
+            const diyaWick = document.getElementById('diya-wick');
+
+            makeDraggable(matchstick, (x, y) => {
+                if (state.currentStep !== 0) return false;
+                const wickRect = diyaWick.getBoundingClientRect();
+                const dist = Math.hypot(x - (wickRect.left + wickRect.width/2), y - (wickRect.top + wickRect.height/2));
+
+                if (dist < 40) {
+                    lightDiya();
+                    return true;
+                }
+                return false;
+            });
+
+            function lightDiya() {
+                document.getElementById('diya-flame').classList.remove('hidden');
+                divineHalo.classList.add('illuminated');
+                matchstick.classList.add('disabled');
+                audioMgr.playDiya();
+                advanceStep();
+            }
+
+            // Steps 2, 3, 4: Drag & Drop Offerings
+            const draggables = document.querySelectorAll('.draggable-item');
+            draggables.forEach(item => {
+                const type = item.dataset.type;
+                if (!type) return;
+
+                makeDraggable(item, (x, y, el) => {
+                    const targetRect = dropZone.getBoundingClientRect();
+                    const inside = (
+                        x >= targetRect.left && x <= targetRect.right &&
+                        y >= targetRect.top && y <= targetRect.bottom
+                    );
+
+                    if (inside) {
+                        if (type === 'flower' && state.currentStep === 1) {
+                            offerFlower(el, x, y);
+                            return true;
+                        } else if (type === 'durva' && state.currentStep === 2) {
+                            offerDurva(el, x, y);
+                            return true;
+                        } else if (type === 'modak' && state.currentStep === 3) {
+                            offerModak(el, x, y);
+                            return true;
+                        }
+                    }
+                    return false;
+                });
+            });
+
+            function spawnLandedItem(symbol, x, y) {
+                const containerRect = ganeshaContainer.getBoundingClientRect();
+                const relX = x - containerRect.left;
+                const relY = y - containerRect.top;
+
+                const landed = document.createElement('div');
+                landed.className = 'landed-offering';
+                landed.innerText = symbol;
+                landed.style.left = `${relX}px`;
+                landed.style.top = `${relY}px`;
+                offeredItemsLayer.appendChild(landed);
+            }
+
+            function offerFlower(el, x, y) {
+                el.classList.add('disabled');
+                spawnLandedItem(el.innerText, x, y);
+                audioMgr.playOffering();
+                state.flowersOffered++;
+                if (state.flowersOffered >= state.requiredFlowers) {
+                    advanceStep();
+                } else {
+                    updateUI();
+                }
+            }
+
+            function offerDurva(el, x, y) {
+                el.classList.add('disabled');
+                spawnLandedItem(el.innerText, x, y);
+                audioMgr.playOffering();
+                advanceStep();
+            }
+
+            function offerModak(el, x, y) {
+                el.classList.add('disabled');
+                spawnLandedItem(el.innerText, x, y);
+                audioMgr.playOffering();
+                state.modaksOffered++;
+                if (state.modaksOffered >= state.requiredModaks) {
+                    advanceStep();
+                }
+            }
+
+            // Step 5: Dhoop / Incense
+            const incenseStick = document.getElementById('incense-stick');
+            const incenseHolder = document.getElementById('incense-holder');
+
+            makeDraggable(incenseStick, (x, y) => {
+                if (state.currentStep !== 4) return false;
+                const rect = incenseHolder.getBoundingClientRect();
+                if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
+                    lightIncense();
+                    return true;
+                }
+                return false;
+            });
+
+            function lightIncense() {
+                incenseStick.classList.add('disabled');
+                const smokeContainer = document.getElementById('smoke-container');
+                setInterval(() => {
+                    const puff = document.createElement('div');
+                    puff.className = 'smoke-puff';
+                    smokeContainer.appendChild(puff);
+                    setTimeout(() => puff.remove(), 2000);
+                }, 400);
+                audioMgr.playDiya();
+                advanceStep();
+            }
+
+            // Step 6: Temple Bell
+            const bell = document.getElementById('hanging-bell');
+            bell.addEventListener('click', ringBell);
+
+            function ringBell() {
+                if (state.currentStep !== 5) return;
+                bell.classList.add('bell-ring-anim');
+                audioMgr.playBell();
+                setTimeout(() => {
+                    bell.classList.remove('bell-ring-anim');
+                    advanceStep();
+                }, 1200);
+            }
+
+            // Step 7: Aarti Circular Motion
+            const aartiPlate = document.getElementById('aarti-plate');
+            const aartiFlame = document.getElementById('aarti-flame');
+            let trackingAarti = false;
+
+            aartiPlate.addEventListener('pointerdown', (e) => {
+                if (state.currentStep !== 6) return;
+                trackingAarti = true;
+                aartiPlate.setPointerCapture(e.pointerId);
+                aartiFlame.classList.remove('hidden');
+                state.lastAartiAngle = null;
+            });
+
+            aartiPlate.addEventListener('pointermove', (e) => {
+                if (!trackingAarti || state.currentStep !== 6) return;
+
+                const gRect = ganeshaContainer.getBoundingClientRect();
+                const gCenterX = gRect.left + gRect.width / 2;
+                const gCenterY = gRect.top + gRect.height / 2;
+
+                aartiPlate.style.transform = `translate(${e.clientX - gCenterX}px, ${e.clientY - gCenterY + 100}px)`;
+
+                const rad = Math.atan2(e.clientY - gCenterY, e.clientX - gCenterX);
+                const deg = rad * (180 / Math.PI);
+
+                if (state.lastAartiAngle !== null) {
+                    let delta = deg - state.lastAartiAngle;
+                    if (delta > 180) delta -= 360;
+                    if (delta < -180) delta += 360;
+                    state.aartiAngleTotal += Math.abs(delta);
+
+                    if (state.aartiAngleTotal >= 1080) {
+                        trackingAarti = false;
+                        completeAarti();
+                    }
+                }
+                state.lastAartiAngle = deg;
+            });
+
+            aartiPlate.addEventListener('pointerup', (e) => {
+                if (!trackingAarti) return;
+                trackingAarti = false;
+                aartiPlate.style.transform = 'translate(0px, 0px)';
+            });
+
+            function completeAarti() {
+                aartiFlame.classList.add('hidden');
+                aartiPlate.style.transform = 'translate(0px, 0px)';
+                audioMgr.playOffering();
+                advanceStep();
+            }
+
+            // Step 8: Namaskar
+            const btnNamaskar = document.getElementById('btn-namaskar');
+            const progressCircle = document.querySelector('.progress-ring__circle');
+            let holdTimer = null;
+            let holdProgress = 0;
+
+            function startHold(e) {
+                if (state.currentStep !== 7) return;
+                e.preventDefault();
+                holdProgress = 0;
+                holdTimer = setInterval(() => {
+                    holdProgress += 5;
+                    const offset = 326.72 - (holdProgress / 100) * 326.72;
+                    progressCircle.style.strokeDashoffset = offset;
+
+                    if (holdProgress >= 100) {
+                        clearInterval(holdTimer);
+                        completeNamaskar();
+                    }
+                }, 100);
+            }
+
+            function endHold() {
+                if (holdTimer) clearInterval(holdTimer);
+                holdProgress = 0;
+                progressCircle.style.strokeDashoffset = 326.72;
+            }
+
+            btnNamaskar.addEventListener('pointerdown', startHold);
+            btnNamaskar.addEventListener('pointerup', endHold);
+            btnNamaskar.addEventListener('pointerleave', endHold);
+
+            function completeNamaskar() {
+                document.getElementById('namaskar-zone').classList.add('hidden');
+                advanceStep();
+            }
+
+            // Final Completion
+            function completePooja() {
+                state.poojaCount++;
+                localStorage.setItem('g3d_pooja_count', state.poojaCount.toString());
+
+                const summary = document.getElementById('pooja-summary');
+                summary.innerHTML = `
+                    <p>🌸 Flowers Offered: ${state.flowersOffered}</p>
+                    <p>🥟 Modaks Offered: ${state.modaksOffered}</p>
+                    <p>🪔 Aarti Rotations: 3</p>
+                    <p> Total Completed Poojas: ${state.poojaCount}</p>
+                `;
+
+                document.getElementById('completion-modal').classList.remove('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
